@@ -2,9 +2,15 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{bussproofs}
 \usepackage{fancyhdr}
+\usepackage[margin=3cm]{geometry}
 \usepackage{mathpartir}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
 
 \pagestyle{fancy}
 \fancyhf{} % Clear all header and footer fields
@@ -12,7 +18,7 @@
 % Header: left, center, right
 \fancyhead[L]{Programming Languages 2}
 \fancyhead[C]{Homework 02}
-\fancyhead[R]{Simon Sutoris 7542170}
+\fancyhead[R]{\today}
 
 % Horizontal line below the header
 %\renewcommand{\headrulewidth}{0.4pt}
@@ -22,7 +28,11 @@
 
 \begin{document}
 
+Simon Sutoris 7542170
+
+%===============================================================================
 \section*{Evaluation Contexts}
+%===============================================================================
 
 The upper rules are computation rules, the lower congruence rules.
 
@@ -59,39 +69,118 @@ E ::= & \\
 \end{array}
 \]
 
+%===============================================================================
 \section*{Evaluation}
+%===============================================================================
 
+%===============================================================================
 \subsection*{Derivation Trees}
-
-%\[
-%\inferrule{(3 * 4) \rightarrow 12}{\texttt{ifz}((3 * 4) - 5; (7 * 7) + 15, 4 + 4) 7 \rightarrow \texttt{ifz}(12 - 5; (7 * 7) + 15, 4 + 4)}
-%\]
+%===============================================================================
 
 \begin{prooftree}
-  \AxiomC{3 * 4 \to 12}
-  \UnaryInfC{(3 * 4) - 5 \to 12 - 5}
-  \UnaryInfC{\texttt{ifz}((3 * 4) - 5; (7 * 7) + 15, 4 + 4) 7 \to \texttt{ifz}(12 - 5; (7 * 7) + 15, 4 + 4)}
+  \AxiomC{3 * 4 \rightarrow 12}
+  \UnaryInfC{(3 * 4) - 5 \rightarrow 12 - 5}
+  \UnaryInfC{\texttt{ifz}((3 * 4) - 5; (7 * 7) + 15, 4 + 4) 7 \rightarrow \texttt{ifz}(12 - 5; (7 * 7) + 15, 4 + 4)}
 \end{prooftree}
 
+%===============================================================================
 \subsection*{Normal Forms}
+%===============================================================================
 
-A term which is in normal form and is a value is quite simple: $t_1 = 42$.
+A term which is in normal form and is a value is quite simple. Any term in the form of $t = v$ solves the task, e.g: $t_1 = 42$. However, there exists no term which is in normal form and is not a value.
 
-However, a term which is in normal form and not a value does not exist. The grammer of the language only allows for three terms: values, concatenation between terms using binary operations, or \texttt{ifz} which consumes 3, possibly different terms.
+\begin{lemma}\label{normal-1}
+Every term $t$, which is not a value, is not in normal form.
+\end{lemma}
 
-To not be in normal form, a term has to be found which cannot be evaluated. A value would fit this requirement, but the question also asks for a term that is not a value. Therefore, a concatenation between binary operations or usage of \texttt{ifz} has to be found.
+\begin{proof} By contraposition: Every term $t$, which is in normal form, is a value.\\
+Due to it being in normal form, no congruence rules and almost no computation rules apply. The only rule left is $v := n$.
+\end{proof}
 
-Let's first look at the binary operations. Either $t_1$ is not a value, congruence rule 1 applies.
+\begin{lemma}\label{normal-2}
+Every term $t$, which is not in normal form, is not a value.
+\end{lemma}
 
-\subsection*{Induction on Derivation Trees}
+\begin{proof}
 
-\subsection*{(i) $t = v$}
+The grammer of the language only allows for three types of terms: values; concatenation between terms using binary operations; or using \texttt{ifz}, which consumes 3, possibly different terms. \\
+
+To not be in normal form, a term has to be found which cannot be evaluated. A value would fit this requirement, but the question also asks for a term that is not a value. Therefore, a concatenation between binary operations or usage of \texttt{ifz} has to be found. \\
+
+Let's first look at the binary operations. Three cases: \\
+
+\textbf{(i)} $t_1 = v_1, t_2 = v_2$: \\
+
+Computation rule 2 applies.\\
+
+\textbf{(ii)} $t_1 = v_1, t_2 = t_2$: \\
+
+$t_2$ is either concatenated with a binary operator, or uses \texttt{ifz}, both of which can be evaluated. Congruence rule 2 applies. \\
+
+\textbf{(iii)} $t_1 = t_1, t_2 = v_2$ \lor $t_1 = t_1, t_2 = t_2$:\\
+
+Analog to (ii), $t_1$ is either concatenated with a binary operator, or uses \texttt{ifz}. Congruence rule 1 applies. \\
+
+\hrule
+%-------------------------------------------------------------------------------
+\vspace{1em}
+
+Secondly, let's look at \texttt{ifz}. Three cases: \\
+
+\textbf{(iv)} $n = 0$: \\
+
+Computation rule 3 applies. \\
+
+\textbf{(v)} $n != 0$: \\
+
+Computation rule 4 applies. \\
+
+\textbf{(vi)} $n != t$ for $t \to t'$: \\
+
+Congruence rule 3 applies. \\
+
+\hrule
+%-------------------------------------------------------------------------------
+\vspace{1em}
+
+Of course, (ii), (iii) and (vi) are recursive. However, the \texttt{size} of a term never grows. It only shrinks, or stays the same when $t = v$, as described in Section \ref{induction-on-derivation-trees}. Therefore, for each term, a computation step exists, meaning there exists no normal form for a term that is not a value. \\
+
+\end{proof}
+
+Because Lemma \ref{normal-1} and \ref{normal-2} hold, there cannot exists a term, which is in normal form and is not a value. \hfill \(\blacksquare\) \\
+
+\hrule
+%-------------------------------------------------------------------------------
+\vspace{1em}
+
+To create a term that is stuck, we would need to build an infinite term, like $t = t_1 \oplus t_2 \oplus ...$, or introduce a syntax error, for example $t = foo$, $t = + 4\ 3$, or $t = \texttt{ifz}(1; 2)$, but the grammar of our language prohibits terms like these, which means these terms are not part of the language.
+
+%The only way I can see a term in this language to get stuck is by either
+%
+%\begin{itemize}
+%\item Have an infinite term, i.e $t_1 \oplus t_2 \oplus ...$, as a computation step does not change the cardinality of this term, or
+%\item introduce a syntax error, like $t = foo$, $t = \oplus 4\ 2$ or $\texttt{ifz}(1,2)$. But the grammar of this language prohibits terms like these.
+%\end{itemize}
+
+\newpage 
+
+%===============================================================================
+\subsection*{Induction on Derivation Trees} \label{induction-on-derivation-trees}
+%===============================================================================
+
+\begin{lemma}
+$\texttt{size}(t) \ge \texttt{size}(t') \mid t \rightarrow t'$
+\end{lemma}
+
+\begin{proof} Three cases.
+
+\textbf{(i)} $t = v$
 
 \begin{align}
 \texttt{size}(t) = \texttt{size}(v) = 1 = \texttt{size(t')}
 \end{align}
 
-\subsection*{(ii) $t = t_1 \oplus t_2, t_1 \to^* v_1$}
+\textbf{(ii)} $t = t_1 \oplus t_2 \mid t_1 \rightarrow^* v_1$
 
 \begin{align}
 \texttt{size}(t_1 \oplus t_2) 
@@ -102,9 +191,9 @@ Let's first look at the binary operations. Either $t_1$ is not a value, congruen
 \texttt{size}(t_1) &\ge 1
 \end{align}
 
-Analog for $t = t_1 \oplus t_2, t_2 \to^* v_2$
+Analog for $t = t_1 \oplus t_2, t_2 \rightarrow^* v_2$ \\
 
-\subsection*{(iii) $t = \texttt{ifz}(t_1; t_2, t_3), t_1 \to^* v_1$}
+\textbf{(iii)} $t = \texttt{ifz}(t_1; t_2, t_3) \mid t_1 \rightarrow^* v_1$
 
 \begin{align}
 \texttt{size}(\texttt{ifz}(t_1; t_2, t_3))
@@ -115,8 +204,12 @@ Analog for $t = t_1 \oplus t_2, t_2 \to^* v_2$
 \texttt{size}(t_1) &\ge 1
 \end{align}
 
-\section*{Types and Programming Languages}
+\end{proof}
 
-Is OCaml mandatory or can we use it at home to veryfy the contents of the book? Also, are the questions mandatory? Chapter 4 was rather short compared to the beginnings of the book till Chapter 3, and I feel like I have to force myself to come up with a question?
+%===============================================================================
+\section*{Types and Programming Languages}
+%===============================================================================
+
+Is OCaml mandatory or can we use it at home to verify the contents of the book? Also, are the questions mandatory? Chapter 4 was rather short compared to the beginnings of the book till Chapter 3, and I feel like I have to force myself to come up with a question?
 
 \end{document}
