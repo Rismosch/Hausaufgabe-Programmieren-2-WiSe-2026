@@ -1,1 +1,1 @@
-# Hausaufgabe-Programmieren-2-WiSe-2026
+# Programmiersprachen-2-WiSe-2026
