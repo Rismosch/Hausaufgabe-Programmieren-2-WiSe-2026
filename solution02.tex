@@ -1,0 +1,122 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bussproofs}
+\usepackage{fancyhdr}
+\usepackage{mathpartir}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+
+% Header: left, center, right
+\fancyhead[L]{Programming Languages 2}
+\fancyhead[C]{Homework 02}
+\fancyhead[R]{Simon Sutoris 7542170}
+
+% Horizontal line below the header
+%\renewcommand{\headrulewidth}{0.4pt}
+
+% Page number centered in the footer
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+\section*{Evaluation Contexts}
+
+The upper rules are computation rules, the lower congruence rules.
+
+Computation rules:
+
+\[
+\begin{array}{rlr}
+v := & n & Values \\
+v_1 \oplus v_2 \rightarrow & & (v_1 \oplus v_2) \\
+\texttt{ifz}(0; t_1, t_2) \rightarrow & & t_1 \\
+\texttt{ifz}(v; t_2, t_2) \rightarrow & & t_2\ \text{if}\ n \ne 0
+\end{array}
+\]
+
+Congruence rules:
+
+\[
+\begin{array}{ccc}
+\inferrule{t_1 \rightarrow t'_1}{t_1 \oplus t_2 \rightarrow t'_1 \oplus t_2} &
+\inferrule{t_2 \rightarrow t'_2}{v \oplus t_2 \rightarrow v \oplus t'_2} &
+\inferrule{t_1 \rightarrow t'_1}{\texttt{ifz}(t_1; t_2, t_3) \rightarrow \texttt{ifz}(t'_1; t_2, t_3)}
+\end{array}
+\]
+
+Congruence rules re-formulated using \textit{evaluation contexts}:
+
+\[
+\begin{array}{ll}
+E ::= & \\
+& [\ ] \\
+& E \oplus t \\
+& v \oplus E \\
+& \texttt{ifz}(E; t_2, t_3)
+\end{array}
+\]
+
+\section*{Evaluation}
+
+\subsection*{Derivation Trees}
+
+%\[
+%\inferrule{(3 * 4) \rightarrow 12}{\texttt{ifz}((3 * 4) - 5; (7 * 7) + 15, 4 + 4) 7 \rightarrow \texttt{ifz}(12 - 5; (7 * 7) + 15, 4 + 4)}
+%\]
+
+\begin{prooftree}
+  \AxiomC{3 * 4 \to 12}
+  \UnaryInfC{(3 * 4) - 5 \to 12 - 5}
+  \UnaryInfC{\texttt{ifz}((3 * 4) - 5; (7 * 7) + 15, 4 + 4) 7 \to \texttt{ifz}(12 - 5; (7 * 7) + 15, 4 + 4)}
+\end{prooftree}
+
+\subsection*{Normal Forms}
+
+A term which is in normal form and is a value is quite simple: $t_1 = 42$.
+
+However, a term which is in normal form and not a value does not exist. The grammer of the language only allows for three terms: values, concatenation between terms using binary operations, or \texttt{ifz} which consumes 3, possibly different terms.
+
+To not be in normal form, a term has to be found which cannot be evaluated. A value would fit this requirement, but the question also asks for a term that is not a value. Therefore, a concatenation between binary operations or usage of \texttt{ifz} has to be found.
+
+Let's first look at the binary operations. Either $t_1$ is not a value, congruence rule 1 applies.
+
+\subsection*{Induction on Derivation Trees}
+
+\subsection*{(i) $t = v$}
+
+\begin{align}
+\texttt{size}(t) = \texttt{size}(v) = 1 = \texttt{size(t')}
+\end{align}
+
+\subsection*{(ii) $t = t_1 \oplus t_2, t_1 \to^* v_1$}
+
+\begin{align}
+\texttt{size}(t_1 \oplus t_2) 
+&= \texttt{size}(t_1) + \texttt{size}(t_2) + 1 \label{eq:case-2-1}\\
+&\ge \texttt{size}(v_1) + \texttt{size}(t_2) + 1 \label{eq:case-2-2}\\
+&= \texttt{size}(t')\\
+\Leftrightarrow \texttt{size}(t_1) &\ge \texttt{size}(v_1) \\
+\texttt{size}(t_1) &\ge 1
+\end{align}
+
+Analog for $t = t_1 \oplus t_2, t_2 \to^* v_2$
+
+\subsection*{(iii) $t = \texttt{ifz}(t_1; t_2, t_3), t_1 \to^* v_1$}
+
+\begin{align}
+\texttt{size}(\texttt{ifz}(t_1; t_2, t_3))
+&= \texttt{size}(t_1) + \texttt{size}(t_2) + \texttt{size}(t_3) + 1 \\
+&\ge \texttt{size}(v_1) + \texttt{size}(t_2) + \texttt{size}(t_3) + 1\\
+&= \texttt{size}(t')\\
+\Leftrightarrow \texttt{size}(t_1) &\ge \texttt{size}(v_1) \\
+\texttt{size}(t_1) &\ge 1
+\end{align}
+
+\section*{Types and Programming Languages}
+
+Is OCaml mandatory or can we use it at home to veryfy the contents of the book? Also, are the questions mandatory? Chapter 4 was rather short compared to the beginnings of the book till Chapter 3, and I feel like I have to force myself to come up with a question?
+
+\end{document}
